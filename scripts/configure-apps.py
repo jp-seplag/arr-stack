@@ -10,7 +10,7 @@ QBIT_TEMP_PASSWORD só é necessária na primeira vez; ela aparece em
 `admin`) é gerada na primeira execução e salva em credenciais.txt (modo 600).
 
 O que configura:
-  qBittorrent  senha, /data/downloads, categorias tv/movies, gerenciamento automático,
+  qBittorrent  senha, /data/downloads, categorias tv/movies, gerenciamento automático, sem seed,
                bypass de auth em localhost (usado pelo Gluetun para atualizar a porta)
   Sonarr/Radarr  login, pasta raiz, qBittorrent (host gluetun), aviso ao Jellyfin
   Prowlarr     login, sincronização com Sonarr/Radarr
@@ -132,13 +132,17 @@ def qbittorrent(pw):
     prefs = {"web_ui_password": pw, "save_path": "/data/downloads", "temp_path_enabled": False,
              "bypass_local_auth": True, "upnp": False, "random_port": False,
              "auto_tmm_enabled": True, "torrent_changed_tmm_enabled": True,
-             "save_path_changed_tmm_enabled": True, "category_changed_tmm_enabled": True}
+             "save_path_changed_tmm_enabled": True, "category_changed_tmm_enabled": True,
+             # sem seed: para ao concluir; o Radarr/Sonarr então remove o torrent e a cópia em downloads/
+             # (a biblioteca fica intacta, é um hardlink). Não use em trackers privados, que exigem ratio.
+             "max_ratio_enabled": True, "max_ratio": 0, "max_seeding_time_enabled": True,
+             "max_seeding_time": 0, "max_ratio_act": 0}
     q("POST", "/app/setPreferences", form={"json": json.dumps(prefs)})
     cats = q("GET", "/torrents/categories") or {}
     for cat in ("tv", "movies"):
         if cat not in cats:
             q("POST", "/torrents/createCategory", form={"category": cat, "savePath": f"/data/downloads/{cat}"})
-    log("senha, pastas, categorias tv/movies e gerenciamento automático")
+    log("senha, pastas, categorias tv/movies, gerenciamento automático, para ao concluir (sem seed)")
 
 
 # ---------------------------------------------------------------- *arr

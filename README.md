@@ -148,6 +148,9 @@ Depois use `http://localhost:8080`, `:9696`, `:8989`, `:7878` e `:6767`.
   Basta criar a pasta.
 - **O Jellyseerr foi descontinuado.** Use o Seerr (`ghcr.io/seerr-team/seerr`), que roda como
   usuário comum (uid 1000) e precisa de `init: true`.
+- **Sem seed por padrão:** o qBittorrent para o torrent ao concluir (ratio 0) e o Radarr/Sonarr o
+  remove, apagando a cópia em `downloads/`; a biblioteca não é afetada (hardlink). Em **trackers
+  privados** isso causa banimento: aumente `max_ratio`/`max_seeding_time` no qBittorrent.
 - **Os servidores "Brasil" da Proton ficam fisicamente em Miami.** O IP aparece como Flórida.
 - **Intel Haswell (4ª geração) só tem VA-API.** Ela não decodifica HEVC por hardware, então dê
   preferência a H.264 1080p ou a aparelhos que reproduzam HEVC direto.
