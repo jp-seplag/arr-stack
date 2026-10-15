@@ -93,7 +93,8 @@ sudo blkid -s UUID -o value /dev/sdX1
 sudo LAN_CIDR=192.168.0.0/24 MEDIA_DISK_UUID=<uuid> ./scripts/host-setup.sh
 ```
 
-O script põe o disco no `/etc/fstab` com `nofail` (o boot não trava sem ele), deixa o ponto de
+O script põe o disco no `/etc/fstab` com `nofail` (o boot não trava sem ele) e espera até 90 s
+por ele (HD USB leva ~20 s para aparecer no boot; com 15 s a montagem desistia), deixa o ponto de
 montagem **imutável** (sem o disco, nada grava no SSD por engano) e faz o Docker **depender do
 disco**: sem ele montado, a stack não sobe. No `.env`, use `MEDIA_ROOT=/mnt/media1/media`.
 

@@ -54,7 +54,7 @@ if [ -n "${MEDIA_DISK_UUID:-}" ]; then
   echo "== Disco de mídia USB ($MEDIA_DISK_UUID -> /mnt/media1)"
   mkdir -p /mnt/media1
   grep -q "$MEDIA_DISK_UUID" /etc/fstab || \
-    echo "UUID=$MEDIA_DISK_UUID  /mnt/media1  ext4  defaults,noatime,nofail,x-systemd.device-timeout=15s  0  2" >> /etc/fstab
+    echo "UUID=$MEDIA_DISK_UUID  /mnt/media1  ext4  defaults,noatime,nofail,x-systemd.device-timeout=90s  0  2" >> /etc/fstab
   mountpoint -q /mnt/media1 || chattr +i /mnt/media1   # sem o disco, ninguém grava no SSD por engano
   systemctl daemon-reload
   mountpoint -q /mnt/media1 || mount /mnt/media1
