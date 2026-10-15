@@ -59,7 +59,7 @@ $MEDIA_ROOT/
 ### 1. Clonar e preparar o `.env`
 
 ```bash
-git clone https://github.com/SEU_USUARIO/arr-stack.git ~/arr-stack
+git clone https://github.com/jp-seplag/arr-stack.git ~/arr-stack
 cd ~/arr-stack
 cp .env.example .env && chmod 600 .env
 nano .env    # PUID/PGID (id -u / id -g), MEDIA_ROOT e a chave WireGuard
