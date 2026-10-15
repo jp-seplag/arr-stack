@@ -81,6 +81,27 @@ local), instala o Docker oficial, endurece o SSH, liga as atualizações automá
 cria as pastas de mídia. Revise `host/sshd-90-hardening.conf` antes de rodar. **Abra uma nova
 sessão SSH antes de fechar a atual.**
 
+### 2b. Disco de mídia USB (opcional, recomendado)
+
+A mídia fica num HD USB montado em `/mnt/media1` (ext4, rótulo `media1`). Para preparar um
+disco **vazio** (o `mkfs` apaga tudo):
+
+```bash
+lsblk -o NAME,SIZE,TRAN,FSTYPE,LABEL      # identifique o disco USB (ex.: /dev/sdc)
+sudo mkfs.ext4 -L media1 -m 0 /dev/sdX1   # só se precisar formatar
+sudo blkid -s UUID -o value /dev/sdX1
+sudo LAN_CIDR=192.168.0.0/24 MEDIA_DISK_UUID=<uuid> ./scripts/host-setup.sh
+```
+
+O script põe o disco no `/etc/fstab` com `nofail` (o boot não trava sem ele), deixa o ponto de
+montagem **imutável** (sem o disco, nada grava no SSD por engano) e faz o Docker **depender do
+disco**: sem ele montado, a stack não sobe. No `.env`, use `MEDIA_ROOT=/mnt/media1/media`.
+
+Para desconectar o disco: `sudo docker compose stop && sudo umount /mnt/media1`.
+
+Prefira a porta **USB 3.0** e um cabo USB 3.0 de verdade: com cabo comum o disco conecta a
+480 Mbps. Dois HDs de 2,5" costumam precisar de um **hub USB com fonte**.
+
 ### 3. Subir a stack
 
 ```bash
@@ -152,6 +173,8 @@ Depois use `http://localhost:8080`, `:9696`, `:8989`, `:7878` e `:6767`.
   remove, apagando a cópia em `downloads/`; a biblioteca não é afetada (hardlink). Em **trackers
   privados** isso causa banimento: aumente `max_ratio`/`max_seeding_time` no qBittorrent.
 - **Os servidores "Brasil" da Proton ficam fisicamente em Miami.** O IP aparece como Flórida.
+- **Um disco USB que “acende mas não aparece”** geralmente está com cabo só de carga ou com mau
+  contato; acompanhe com `sudo dmesg -wT` ao conectar.
 - **Intel Haswell (4ª geração) só tem VA-API.** Ela não decodifica HEVC por hardware, então dê
   preferência a H.264 1080p ou a aparelhos que reproduzam HEVC direto.
 

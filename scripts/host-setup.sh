@@ -3,6 +3,7 @@
 # Idempotente: pode ser rodado de novo sem estragar nada.
 #
 #   sudo LAN_CIDR=192.168.0.0/24 ./scripts/host-setup.sh
+#   sudo LAN_CIDR=192.168.0.0/24 MEDIA_DISK_UUID=<uuid do blkid> ./scripts/host-setup.sh   (mídia em disco USB)
 #
 # Faz: desliga suspensão do notebook, firewall (ufw), Docker oficial,
 # endurecimento do SSH, atualizações automáticas de segurança, log rotation do Docker.
@@ -49,8 +50,20 @@ systemctl reload ssh
 echo "== 5/6 Atualizações automáticas de segurança"
 install -m 0644 "$HERE/host/apt-20auto-upgrades" /etc/apt/apt.conf.d/20auto-upgrades
 
+if [ -n "${MEDIA_DISK_UUID:-}" ]; then
+  echo "== Disco de mídia USB ($MEDIA_DISK_UUID -> /mnt/media1)"
+  mkdir -p /mnt/media1
+  grep -q "$MEDIA_DISK_UUID" /etc/fstab || \
+    echo "UUID=$MEDIA_DISK_UUID  /mnt/media1  ext4  defaults,noatime,nofail,x-systemd.device-timeout=15s  0  2" >> /etc/fstab
+  mountpoint -q /mnt/media1 || chattr +i /mnt/media1   # sem o disco, ninguém grava no SSD por engano
+  systemctl daemon-reload
+  mountpoint -q /mnt/media1 || mount /mnt/media1
+  install -D -m 0644 "$HERE/host/docker-media-disk.conf" /etc/systemd/system/docker.service.d/media-disk.conf
+  systemctl daemon-reload
+fi
+
 echo "== 6/6 Pastas de mídia"
-MEDIA_ROOT="$(grep -oP '^MEDIA_ROOT=\K.*' "$HERE/.env" 2>/dev/null || echo "/home/$SSH_USER/media")"
+MEDIA_ROOT="$(grep -oP '^MEDIA_ROOT=\K[^#[:space:]]+' "$HERE/.env" 2>/dev/null || echo "/home/$SSH_USER/media")"
 install -d -o "$SSH_USER" -g "$SSH_USER" "$MEDIA_ROOT"/{downloads/movies,downloads/tv,movies,shows}
 
 echo
