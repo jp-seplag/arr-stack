@@ -81,7 +81,7 @@ local), instala o Docker oficial, endurece o SSH, liga as atualizações automá
 cria as pastas de mídia. Revise `host/sshd-90-hardening.conf` antes de rodar. **Abra uma nova
 sessão SSH antes de fechar a atual.**
 
-### 2b. Disco de mídia USB (opcional, recomendado)
+### 2b. Disco de mídia USB (opcional)
 
 A mídia fica num HD USB montado em `/mnt/media1` (ext4, rótulo `media1`). Para preparar um
 disco **vazio** (o `mkfs` apaga tudo):
@@ -99,6 +99,11 @@ montagem **imutável** (sem o disco, nada grava no SSD por engano) e faz o Docke
 disco**: sem ele montado, a stack não sobe. No `.env`, use `MEDIA_ROOT=/mnt/media1/media`.
 
 Para desconectar o disco: `sudo docker compose stop && sudo umount /mnt/media1`.
+
+> **Neste notebook a mídia ficou no disco interno.** A única porta USB 3.0 falha em SuperSpeed:
+> o HD caía sob carga e um SSD com adaptador JMicron só conectava em USB 2.0 (a porta física é
+> compartilhada entre os controladores xHCI e EHCI do chipset Intel série 8). Teste a porta com
+> `lsusb -t` (procure 5000M) antes de depender de um disco externo.
 
 Prefira a porta **USB 3.0** e um cabo USB 3.0 de verdade: com cabo comum o disco conecta a
 480 Mbps. Dois HDs de 2,5" costumam precisar de um **hub USB com fonte**.
