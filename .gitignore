@@ -1,0 +1,14 @@
+# Lista branca: tudo é ignorado, exceto o que for liberado abaixo.
+# As pastas de cada app (configs, bancos, chaves de API), o .env (chave da VPN)
+# e o credenciais.txt NUNCA devem ir para o repositório.
+/*
+!/.gitignore
+!/README.md
+!/docker-compose.yml
+!/.env.example
+!/host/
+!/scripts/
+
+# lixo de execução
+__pycache__/
+*.pyc
